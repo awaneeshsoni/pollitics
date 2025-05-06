@@ -27,7 +27,7 @@ This is a real-time voting application built with **React** on the frontend and 
 
 1. Clone the Repository
 
-git clone https://github.com/your-username/pollitics.git
+git clone https://github.com/awaneeshsoni/pollitics
 cd pollitics
 
 2. Install Dependencies

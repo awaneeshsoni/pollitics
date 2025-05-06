@@ -69,8 +69,11 @@ const startTimer = (roomCode) => {
     }, 1000);
 };
 
-io.on('connection', (socket) => {
+app.get('/', (req,res) => {
+    res.send('<h1>hi there</h1>');
+})
 
+io.on('connection', (socket) => {
     socket.on('createRoom', ({ userName, question, options, duration }) => {
         if (!userName?.trim()) return socket.emit('error', 'Username cannot be empty.');
         if (!question?.trim()) return socket.emit('error', 'Poll question cannot be empty.');

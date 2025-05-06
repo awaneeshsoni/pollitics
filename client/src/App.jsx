@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import Login from './components/Login';
 import PollRoom from './components/PollRoom';
 
-const SERVER_URL = import.meta.env.VITE_APP_SERVER_URL || 'http://localhost:3001';
+const SERVER_URL = import.meta.env.VITE_APP_SERVER_URL;
 
 function App() {
     const [userName, setUserName] = useState('');

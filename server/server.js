@@ -70,7 +70,7 @@ const startTimer = (roomCode) => {
 };
 
 app.get('/', (req,res) => {
-    res.send('<h1>hi there</h1>');
+    res.send(<h1>hi there</h1>)
 })
 
 io.on('connection', (socket) => {

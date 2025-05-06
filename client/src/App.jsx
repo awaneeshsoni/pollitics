@@ -47,7 +47,7 @@ function App() {
         socketRef.current = socket; 
 
         socket.on('connect', () => {
-            console.log('Socket connected:', socket.id);
+            console.log('Socket connected');
             setError('');
         });
 
@@ -63,6 +63,7 @@ function App() {
 
         socket.on('connect_error', (err) => {
              console.error('Connection Error:', err);
+
              displayError(`Failed to connect to poll server (${err.message}).`);
              setIsInRoom(false);
              socketRef.current = null; 
@@ -84,7 +85,7 @@ function App() {
         });
 
         socket.on('joinSuccess', ({ roomCode: joinedRoomCode, initialState }) => {
-            console.log('Received joinSuccess:', joinedRoomCode, initialState);
+            
             setRoomCode(joinedRoomCode);
             setPollState(initialState);
             checkLocalStorageVote(joinedRoomCode, userName, initialState.options);
@@ -93,7 +94,7 @@ function App() {
         });
 
         socket.on('roomState', (state) => {
-            console.log('Received roomState update:', state);
+            
             setPollState(state);
             checkLocalStorageVote(roomCode, userName, state.options);
         });

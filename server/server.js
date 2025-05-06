@@ -192,14 +192,10 @@ io.on('connection', (socket) => {
             if (room.users.has(socket.id)) {
                 const userName = room.users.get(socket.id);
                 room.users.delete(socket.id);
-
-                if (room.users.size === 0) {
-                    if (room.timerInterval) clearInterval(room.timerInterval);
-                    delete rooms[roomCode];
-                } else {
+                if(room.users.size != 0){
                     broadcastRoomState(roomCode);
                 }
-                break;
+                
             }
         }
     });

@@ -23,7 +23,7 @@ function App() {
         if (clearErrorTimeoutRef.current) {
             clearTimeout(clearErrorTimeoutRef.current);
         }
-        clearErrorTimeoutRef.current = setTimeout(() => setError(''), 5000); 
+        clearErrorTimeoutRef.current = setTimeout(() => setError(''), 5000);
     }, []);
 
     const checkLocalStorageVote = useCallback((currentRoomCode, currentUserName, currentOptions) => {
@@ -31,20 +31,20 @@ function App() {
             const savedVote = localStorage.getItem(`vote-${currentRoomCode}-${currentUserName}`);
             if (savedVote && currentOptions.includes(savedVote)) {
                 setVotedOption(savedVote);
-                return true; 
+                return true;
             } else if (savedVote) {
                 localStorage.removeItem(`vote-${currentRoomCode}-${currentUserName}`);
             }
         }
-        setVotedOption(null); 
+        setVotedOption(null);
         return false;
     }, []);
 
     useEffect(() => {
-        if (socketRef.current) return; 
+        if (socketRef.current) return;
 
         const socket = io(SERVER_URL);
-        socketRef.current = socket; 
+        socketRef.current = socket;
 
         socket.on('connect', () => {
             console.log('Socket connected');
@@ -54,19 +54,19 @@ function App() {
         socket.on('disconnect', (reason) => {
             console.log('Socket disconnected:', reason);
             if (reason !== 'io client disconnect') {
-                 displayError('Connection lost. Attempting to reconnect...');
-                 setIsInRoom(false); 
-                 setVotedOption(null);
-                 setPollState({ users: [], votes: {}, question: '', options: [], timer: 0, isVotingActive: false });
+                displayError('Connection lost. Attempting to reconnect...');
+                setIsInRoom(false);
+                setVotedOption(null);
+                setPollState({ users: [], votes: {}, question: '', options: [], timer: 0, isVotingActive: false });
             }
         });
 
         socket.on('connect_error', (err) => {
-             console.error('Connection Error:', err);
+            console.error('Connection Error:', err);
 
-             displayError(`Failed to connect to poll server (${err.message}).`);
-             setIsInRoom(false);
-             socketRef.current = null; 
+            displayError(`Failed to connect to poll server (${err.message}).`);
+            setIsInRoom(false);
+            socketRef.current = null;
         });
 
         socket.on('error', (errorMessage) => {
@@ -75,17 +75,16 @@ function App() {
         });
 
         socket.on('roomCreated', ({ roomCode: newRoomCode, initialState }) => {
-            console.log('Received roomCreated:', newRoomCode, initialState);
             setRoomCode(newRoomCode);
             setPollState(initialState);
-            setVotedOption(null); 
-            localStorage.removeItem(`vote-${newRoomCode}-${userName}`); 
+            setVotedOption(null);
+            localStorage.removeItem(`vote-${newRoomCode}-${userName}`);
             setIsInRoom(true);
             setError('');
         });
 
         socket.on('joinSuccess', ({ roomCode: joinedRoomCode, initialState }) => {
-            
+
             setRoomCode(joinedRoomCode);
             setPollState(initialState);
             checkLocalStorageVote(joinedRoomCode, userName, initialState.options);
@@ -94,22 +93,22 @@ function App() {
         });
 
         socket.on('roomState', (state) => {
-            
+
             setPollState(state);
             checkLocalStorageVote(roomCode, userName, state.options);
         });
 
         socket.on('updateVotes', (votes) => {
-            console.log('Received updateVotes:', votes);
             setPollState(prevState => ({ ...prevState, votes }));
         });
 
         socket.on('timerUpdate', (timer) => {
-             setPollState(prevState => ({ ...prevState, timer }));
+            setPollState(prevState => ({ ...prevState, timer }));
         });
 
         socket.on('pollEnded', (finalVotes) => {
             console.log('Received pollEnded:', finalVotes);
+            
             setPollState(prevState => ({
                 ...prevState,
                 votes: finalVotes,
@@ -121,19 +120,19 @@ function App() {
         return () => {
             console.log('Cleaning up socket connection...');
             if (clearErrorTimeoutRef.current) {
-                 clearTimeout(clearErrorTimeoutRef.current);
+                clearTimeout(clearErrorTimeoutRef.current);
             }
             if (socket) {
                 socket.disconnect();
             }
             socketRef.current = null;
         };
-    }, []); 
+    }, []);
 
 
     useEffect(() => {
         if (isInRoom && roomCode && userName && pollState.options?.length > 0) {
-             checkLocalStorageVote(roomCode, userName, pollState.options);
+            checkLocalStorageVote(roomCode, userName, pollState.options);
         }
     }, [isInRoom, roomCode, userName, pollState.options, checkLocalStorageVote]);
 
@@ -147,7 +146,7 @@ function App() {
 
         const currentSocket = socketRef.current;
         if (currentSocket?.connected) {
-            setUserName(name.trim()); 
+            setUserName(name.trim());
             setError('');
             currentSocket.emit('createRoom', {
                 userName: name.trim(), question: question.trim(), options: options.map(o => o.trim()), duration: dur
@@ -155,7 +154,7 @@ function App() {
         } else {
             displayError("Not connected to server. Please wait or refresh.");
         }
-    }, [displayError]); 
+    }, [displayError]);
 
     const handleJoinRoom = useCallback((name, code) => {
         if (!name.trim()) return displayError("Username is required.");
@@ -165,13 +164,13 @@ function App() {
         const currentSocket = socketRef.current;
         if (currentSocket?.connected) {
             const trimmedName = name.trim();
-            setUserName(trimmedName); 
+            setUserName(trimmedName);
             setError('');
             currentSocket.emit('joinRoom', { userName: trimmedName, roomCode: trimmedCode });
         } else {
             displayError("Not connected to server. Please wait or refresh.");
         }
-    }, [displayError]); 
+    }, [displayError]);
 
     const handleVote = useCallback((option) => {
         if (votedOption) return displayError("You have already voted.");
@@ -182,21 +181,24 @@ function App() {
 
         setError('');
         currentSocket.emit('vote', { roomCode, option });
-        setVotedOption(option); 
+        setVotedOption(option);
         localStorage.setItem(`vote-${roomCode}-${userName}`, option);
 
-    }, [votedOption, pollState.isVotingActive, roomCode, userName, displayError]); 
+    }, [votedOption, pollState.isVotingActive, roomCode, userName, displayError]);
     return (
         <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-8">
-                Poll-itics
-            </h1>
+            <a href='/'>
+                <h1 className="text-3xl md:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-8">
+                    Poll-itics
+                </h1>
+            </a>
+
 
             {error && (
                 <div
-                 className="w-full max-w-lg mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md shadow-md text-center relative"
-                 role="alert"
-                 aria-live="assertive"
+                    className="w-full max-w-lg mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md shadow-md text-center relative"
+                    role="alert"
+                    aria-live="assertive"
                 >
                     <span>{error}</span>
                     <button

@@ -188,7 +188,7 @@ function App() {
     return (
         <div className="container mx-auto px-4 py-8 min-h-screen flex flex-col items-center">
             <a href='/'>
-                <h1 className="text-3xl md:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 mb-8">
+                <h1 className="text-3xl md:text-4xl font-bold text-center text-black mb-8">
                     Poll-itics
                 </h1>
             </a>
